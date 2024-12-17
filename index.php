@@ -14,8 +14,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
-        /* Welcome Page background */
         body {
             background-image: url('assets/images/b5.jpg'); 
             background-size: cover; 
@@ -72,7 +70,7 @@
             text-decoration: underline;
         }
 
-        /* Footer Styling */
+        
         footer {
             position: absolute; 
             bottom: 0px; 

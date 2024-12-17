@@ -10,16 +10,15 @@
 
     <!-- Internal CSS -->
     <style>
-        /* General Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Page background */
+       
         body {
-            background-image: url('../assets/images/b5.jpg'); /* Path to your image */
+            background-image: url('../assets/images/b5.jpg'); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -37,13 +36,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+            background-color: rgba(0, 0, 0, 0.5); 
             backdrop-filter: blur(1px);
             z-index: -1;
         }
 
         .login-container {
-            background: rgba(0, 0, 0, 0.7); /* Semi-transparent background for the form */
+            background: rgba(0, 0, 0, 0.7); 
             padding: 30px;
             border-radius: 10px;
             max-width: 400px;

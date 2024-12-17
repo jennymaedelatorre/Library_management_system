@@ -14,9 +14,11 @@
             background: #4CAF50;
             padding-top: 20px;
         }
-        .logo h2{
+
+        .logo h2 {
             font-family: 'Courier New', Courier, monospace;
         }
+
         .sidebar a {
             color: white;
             padding: 10px;
@@ -37,13 +39,12 @@
         }
 
         .sidebar i {
-            margin-right: 10px; 
+            margin-right: 10px;
         }
     </style>
     <h2 class="logo text-center mt-5 ms-0" style="font-family:Georgia, 'Times New Roman', Times, serif; font-weight:bolder; font-size:1.8rem; font-style:normal;">StoryScape</h2>
     <hr class="text-white fw-bold">
-    <a href="admin.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-    <a href="manage_user.php"><i class="fas fa-users"></i> Manage Users</a>
-    <a href="reports.php"><i class="fas fa-chart-line"></i> Reports</a>
+    <a href="../dashboard/librarian.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="../dashboard/student_borrow.php"><i class="fas fa-book"></i>Manage Books</a>
     <a href="../actions/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>

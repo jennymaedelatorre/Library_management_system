@@ -1,7 +1,7 @@
 <?php
 include '../config.php';
 
-// Retrieve input data
+
 $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
 $password = $_POST['password'];
 
@@ -20,7 +20,7 @@ if ($result && pg_num_rows($result) === 1) {
 
     // Verify the password
     if (password_verify($password, $user['password'])) {
-        // Start the session and store user data
+        
         session_start();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['name'] = $user['name'];

@@ -42,8 +42,8 @@
     </style>
     <h2 class="logo text-center mt-5 ms-0" style="font-family:Georgia, 'Times New Roman', Times, serif; font-weight:bolder; font-size:1.8rem; font-style:normal;">StoryScape</h2>
     <hr class="text-white fw-bold">
-    <a href="admin.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-    <a href="manage_user.php"><i class="fas fa-users"></i> Manage Users</a>
-    <a href="reports.php"><i class="fas fa-chart-line"></i> Reports</a>
+    <a href="../dashboard/student.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="../dashboard/borrowed_books.php"><i class="fas fa-book-open"></i> My Borrowed Books</a> 
     <a href="../actions/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+
 </div>

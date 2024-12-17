@@ -13,10 +13,10 @@ if (!$email || !$role) {
     exit;
 }
 
-// Prepare the query
+
 $query = "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)";
 
-// Execute the query with parameters
+
 $result = pg_query_params($conn, $query, [$name, $email, $password, $role]);
 
 // Check the result
@@ -27,10 +27,9 @@ if ($result) {
         window.location.href = '../pages/login.php';
     </script>";
 } else {
-    // Registration failed
     echo "Error: " . pg_last_error($conn);
 }
 
-// Close the database connection
+
 pg_close($conn);
 ?>
