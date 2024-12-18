@@ -193,28 +193,37 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                 </tbody>
             </table>
 
-            <!-- Table for Students -->
             <h2 class="mt-5">List of All Students</h2>
-            <table class="table table-bordered user-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">User ID</th>
-                        <th style="width: 30%;">Name</th>
-                        <th style="width: 40%;">Email</th>
-                        <th style="width: 20%;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $student_query = "SELECT id, name, email, role FROM users WHERE role = 3"; // Fetch Students
-                    $student_result = pg_query($conn, $student_query);
+<table class="table table-bordered user-table">
+    <thead>
+        <tr>
+            <th style="width: 10%;">User ID</th>
+            <th style="width: 25%;">Name</th>
+            <th style="width: 30%;">Email</th>
+            <th style="width: 20%;">Total Borrowed Books</th>
+            <th style="width: 15%;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Modify the query to include total_borrowed_books from the user_activity_summary view
+        $student_query = "
+            SELECT u.id, u.name, u.email, u.role, uas.total_borrowed_books
+            FROM users u
+            LEFT JOIN user_activity_summary uas ON u.id = uas.user_id
+            WHERE u.role = 3"; // Fetch only students (assuming role 3 is student)
 
-                    if ($student_result && pg_num_rows($student_result) > 0) {
-                        while ($student = pg_fetch_assoc($student_result)) {
-                            echo "<tr>
+        // Execute the query
+        $student_result = pg_query($conn, $student_query);
+
+        if ($student_result && pg_num_rows($student_result) > 0) {
+            while ($student = pg_fetch_assoc($student_result)) {
+                // Fetch the data from the result and display it
+                echo "<tr>
                         <td>{$student['id']}</td>
                         <td>{$student['name']}</td>
                         <td>{$student['email']}</td>
+                        <td>{$student['total_borrowed_books']}</td> <!-- Display total borrowed books -->
                         <td>
                             <button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editUserModal' 
                                 data-id='{$student['id']}' 
@@ -224,13 +233,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                              <button class='delete-btn btn-danger' data-id='{$student['id']}' data-bs-toggle='modal' data-bs-target='#deleteModal'>Delete</button>
                         </td>
                     </tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='4'>No students found.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+            }
+        } else {
+            echo "<tr><td colspan='5'>No students found.</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
         </div>
 
         <!-- Modal for Adding a New User -->

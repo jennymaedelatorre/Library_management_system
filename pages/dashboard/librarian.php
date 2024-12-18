@@ -27,30 +27,26 @@ $students_query = "SELECT COUNT(*) AS total_students FROM users WHERE role = 3";
 $students_result = pg_query($conn, $students_query);
 $total_students = pg_fetch_result($students_result, 0, 'total_students');
 
+$borrowed_books_stats_query = "SELECT total_borrowed_books, total_books_notavailable, total_books_available, total_books FROM borrowed_books_stats";
+$borrowed_books_stats_result = executeQuery($conn, $borrowed_books_stats_query, "Error fetching borrowed books stats");
 
-$total_books_query = "SELECT COUNT(*) AS total_books FROM books";
-$total_books_result = executeQuery($conn, $total_books_query, "Error in total books query");
-$total_books = pg_fetch_result($total_books_result, 0, 'total_books');
+// Initialize default values
+$total_books_borrowed = 0;
+$total_books_notavailable = 0;
+$total_books_available = 0;
+$total_books = 0;
 
-$books_available_query = "SELECT COUNT(*) AS total_books_available FROM books WHERE available = TRUE";
-$books_available_result = executeQuery($conn, $books_available_query, "Error in available books query");
-$total_books_available = pg_fetch_result($books_available_result, 0, 'total_books_available');
-
-$books_notavailable_query = "
-    SELECT COUNT(*) AS total_books_notavailable 
-    FROM books 
-    WHERE available = FALSE 
-    AND id NOT IN (
-        SELECT book_id FROM transactions WHERE transaction_type = 'borrow'
-    )
-";
-$books_notavailable_result = executeQuery($conn, $books_notavailable_query, "Error in available books query");
-$total_books_notavailable = pg_fetch_result($books_notavailable_result, 0, 'total_books_notavailable');
-
-$books_borrowed_query = "SELECT COUNT(*) AS total_books_borrowed FROM transactions WHERE transaction_type = 'borrow'";
-$books_borrowed_result = executeQuery($conn, $books_borrowed_query, "Error in borrowed books query");
-$total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_borrowed');
-
+// Check if the query returns any result for borrowed books stats
+if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 0) {
+    // Fetch the stats from the result
+    $stats = pg_fetch_assoc($borrowed_books_stats_result);
+    
+    // Assign values from the result or default to 0 if not available
+    $total_books_borrowed = isset($stats['total_borrowed_books']) ? (int)$stats['total_borrowed_books'] : 0;
+    $total_books_notavailable = isset($stats['total_books_notavailable']) ? (int)$stats['total_books_notavailable'] : 0;
+    $total_books_available = isset($stats['total_books_available']) ? (int)$stats['total_books_available'] : 0;
+    $total_books = isset($stats['total_books']) ? (int)$stats['total_books'] : 0;
+}
 
 ?>
 <!DOCTYPE html>
