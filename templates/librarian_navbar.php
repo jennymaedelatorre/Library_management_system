@@ -42,7 +42,7 @@
             margin-right: 10px;
         }
     </style>
-    <h2 class="logo text-center mt-5 ms-0" style="font-family:Georgia, 'Times New Roman', Times, serif; font-weight:bolder; font-size:1.8rem; font-style:normal;">StoryScape</h2>
+    <h2 class="logo text-center mt-5 ms-0" style="font-family:Georgia, 'Times New Roman', Times, serif; font-weight:bolder; font-size:1.8rem; font-style:normal;">Archiva</h2>
     <hr class="text-white fw-bold">
     <a href="../dashboard/librarian.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
     <a href="../dashboard/student_borrow.php"><i class="fas fa-book"></i>Manage Books</a>

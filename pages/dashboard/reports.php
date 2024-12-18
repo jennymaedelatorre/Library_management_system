@@ -128,33 +128,47 @@ if (!$returned_books_result) {
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>Student ID</th> <!-- Added Student ID column -->
+                            <th>Member ID</th>
                             <th>Book ID</th>
                             <th>Title</th>
                             <th>Author</th>
-                            <th>Genre</th>
                             <th>Due Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
+                        // Call the GetCurrentlyBorrowedBooks function to get all borrowed books
+                        $borrowed_books_query = "
+                            SELECT * FROM GetCurrentlyBorrowedBooks()
+                        ";
+                        $borrowed_books_result = pg_query($conn, $borrowed_books_query);
+
+                        if (!$borrowed_books_result) {
+                            die("Error fetching borrowed books: " . pg_last_error($conn));
+                        }
+
+                        // Check if there are borrowed books to display
                         if (pg_num_rows($borrowed_books_result) > 0) {
                             while ($book = pg_fetch_assoc($borrowed_books_result)) {
                                 echo "<tr>
-                                    <td>{$book['id']}</td>
+                                    <td>{$book['studentid']}</td> <!-- Display Student ID -->
+                                    <td>{$book['memberid']}</td> <!-- Display Member ID (user ID) -->
+                                    <td>{$book['bookid']}</td>
                                     <td>{$book['title']}</td>
                                     <td>{$book['author']}</td>
-                                    <td>{$book['genre']}</td>
-                                    <td>{$book['due_date']}</td>
+                                    <td>{$book['duedate']}</td>
                                 </tr>";
                             }
                         } else {
-                            echo "<tr><td colspan='5'>No borrowed books found.</td></tr>";
+                            echo "<tr><td colspan='6'>No borrowed books found.</td></tr>";
                         }
-                        
                         ?>
                     </tbody>
                 </table>
             </div>
+
+
 
             <!-- Returned Books Section -->
             <div class="mt-4">
@@ -162,24 +176,35 @@ if (!$returned_books_result) {
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th>Student ID</th>
                             <th>Book ID</th>
                             <th>Title</th>
                             <th>Author</th>
-                            <th>Genre</th>
                             <th>Return Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
+                        // Call the GetReturnedBooks function to get all returned books
+                        $returned_books_query = "
+                            SELECT * FROM GetReturnedBooks()  -- Using the function to fetch returned books
+                        ";
+                        $returned_books_result = pg_query($conn, $returned_books_query);
+
+                        if (!$returned_books_result) {
+                            die("Error fetching returned books: " . pg_last_error($conn));
+                        }
+
+                        // Check if there are returned books to display
                         if (pg_num_rows($returned_books_result) > 0) {
                             while ($book = pg_fetch_assoc($returned_books_result)) {
                                 echo "<tr>
-                                    <td>{$book['id']}</td>
+                                    <td>{$book['studentid']}</td> <!-- Display Student ID -->
+                                    <td>{$book['bookid']}</td>
                                     <td>{$book['title']}</td>
                                     <td>{$book['author']}</td>
-                                    <td>{$book['genre']}</td>
-                                    <td>{$book['return_date']}</td>
-                                  </tr>";
+                                    <td>{$book['returndate']}</td>
+                                </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='5'>No returned books found.</td></tr>";
@@ -188,6 +213,7 @@ if (!$returned_books_result) {
                     </tbody>
                 </table>
             </div>
+
 
             <!-- Users Activity Logs Section -->
             <h2 class="mt-5">List of User Activity Logs</h2>
@@ -205,22 +231,22 @@ if (!$returned_books_result) {
                 <tbody>
                     <?php
                     $user_log_query = "SELECT id, timestamp, user_id, user_type, table_name, action 
-                               FROM activity_logs 
-                               WHERE table_name = 'users' 
-                               ORDER BY timestamp DESC
-                               LIMIT 6"; 
+                                    FROM activity_logs 
+                                    WHERE table_name = 'users' 
+                                    ORDER BY timestamp DESC
+                                    LIMIT 6"; 
                     $user_log_result = pg_query($conn, $user_log_query);
 
                     if ($user_log_result && pg_num_rows($user_log_result) > 0) {
                         while ($log = pg_fetch_assoc($user_log_result)) {
                             echo "<tr>
-                        <td>{$log['id']}</td>
-                        <td>{$log['timestamp']}</td>
-                        <td>{$log['user_id']}</td>
-                        <td>{$log['user_type']}</td>
-                        <td>{$log['table_name']}</td>
-                        <td>{$log['action']}</td>
-                    </tr>";
+                                <td>{$log['id']}</td>
+                                <td>{$log['timestamp']}</td>
+                                <td>{$log['user_id']}</td>
+                                <td>{$log['user_type']}</td>
+                                <td>{$log['table_name']}</td>
+                                <td>{$log['action']}</td>
+                            </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='7'>No user activity logs found.</td></tr>";
@@ -245,22 +271,22 @@ if (!$returned_books_result) {
                 <tbody>
                     <?php
                     $book_log_query = "SELECT id, timestamp, user_id, user_type, table_name, action 
-                               FROM activity_logs 
-                               WHERE table_name = 'books' 
-                               ORDER BY timestamp DESC
-                               LIMIT 6";  
+                                    FROM activity_logs 
+                                    WHERE table_name = 'books' 
+                                    ORDER BY timestamp DESC
+                                    LIMIT 6";  
                     $book_log_result = pg_query($conn, $book_log_query);
 
                     if ($book_log_result && pg_num_rows($book_log_result) > 0) {
                         while ($log = pg_fetch_assoc($book_log_result)) {
                             echo "<tr>
-                        <td>{$log['id']}</td>
-                        <td>{$log['timestamp']}</td>
-                        <td>{$log['user_id']}</td>
-                        <td>{$log['user_type']}</td>
-                        <td>{$log['table_name']}</td>
-                        <td>{$log['action']}</td>
-                    </tr>";
+                                <td>{$log['id']}</td>
+                                <td>{$log['timestamp']}</td>
+                                <td>{$log['user_id']}</td>
+                                <td>{$log['user_type']}</td>
+                                <td>{$log['table_name']}</td>
+                                <td>{$log['action']}</td>
+                            </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='7'>No book activity logs found.</td></tr>";

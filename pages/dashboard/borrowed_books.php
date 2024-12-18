@@ -7,7 +7,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     header("Location: ../pages/login.php");
     exit;
 }
+
+$borrowed_books_query = "SELECT SUM(total_borrowed_books) AS total_borrowed_books FROM user_activity_summary";
+$borrowed_books_result = pg_query($conn, $borrowed_books_query);
+
+// Check if the query is successful
+if ($borrowed_books_result) {
+    $row = pg_fetch_assoc($borrowed_books_result);
+    $total_borrowed_books = $row['total_borrowed_books'];
+} else {
+    die("Error fetching borrowed books stats: " . pg_last_error($conn));
+}
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +36,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     <style>
         .container-fluid {
             display: flex;
+        }
+        h2 {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-left: 20px;
+            font-style: italic;
         }
 
         .content {
@@ -94,8 +114,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
         </h1>
         <hr>
 
+        <h2>Total Number of borrowed books:  <span style="font-size: 25px;"><?php echo $total_borrowed_books; ?></span></h2>
+
         <!-- List of Borrowed Books -->
-        <table class="table table-bordered" style="margin-top: 60px;">
+        <table class="table table-bordered" style="margin-top: 30px;">
             <thead>
                 <tr>
                     <th>Transaction ID</th>

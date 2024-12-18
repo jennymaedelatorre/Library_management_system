@@ -34,36 +34,35 @@ $students_query = "SELECT COUNT(*) AS total_students FROM users WHERE role = 3";
 $students_result = pg_query($conn, $students_query);
 $total_students = pg_fetch_result($students_result, 0, 'total_students');
 
-
-
 $admins_query = "SELECT COUNT(*) AS total_admins FROM users WHERE role = 1";
 $admins_result = executeQuery($conn, $admins_query, "Error in admins query");
 $total_admins = pg_fetch_result($admins_result, 0, 'total_admins');
 
 
-$total_books_query = "SELECT COUNT(*) AS total_books FROM books";
-$total_books_result = executeQuery($conn, $total_books_query, "Error in total books query");
-$total_books = pg_fetch_result($total_books_result, 0, 'total_books');
+$borrowed_books_stats_query = "SELECT total_borrowed_books, total_books_notavailable, total_books_available, total_books FROM borrowed_books_stats";
+$borrowed_books_stats_result = executeQuery($conn, $borrowed_books_stats_query, "Error fetching borrowed books stats");
 
-$books_available_query = "SELECT COUNT(*) AS total_books_available FROM books WHERE available = TRUE";
-$books_available_result = executeQuery($conn, $books_available_query, "Error in available books query");
-$total_books_available = pg_fetch_result($books_available_result, 0, 'total_books_available');
 
-$books_notavailable_query = "
-    SELECT COUNT(*) AS total_books_notavailable 
-    FROM books 
-    WHERE available = FALSE 
-    AND id NOT IN (
-        SELECT book_id FROM transactions WHERE transaction_type = 'borrow'
-    )
-";
-$books_notavailable_result = executeQuery($conn, $books_notavailable_query, "Error in available books query");
-$total_books_notavailable = pg_fetch_result($books_notavailable_result, 0, 'total_books_notavailable');
+// Initialize default values
+$total_books_borrowed = 0;
+$total_books_notavailable = 0;
+$total_books_available = 0;
+$total_books = 0;
 
-// Query to fetch total number of borrowed books
-$books_borrowed_query = "SELECT COUNT(*) AS total_books_borrowed FROM transactions WHERE transaction_type = 'borrow'";
-$books_borrowed_result = executeQuery($conn, $books_borrowed_query, "Error in borrowed books query");
-$total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_borrowed');
+// Check if the query returns any result for borrowed books stats
+if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 0) {
+    // Fetch the stats from the result
+    $stats = pg_fetch_assoc($borrowed_books_stats_result);
+    
+    // Assign values from the result or default to 0 if not available
+    $total_books_borrowed = isset($stats['total_borrowed_books']) ? (int)$stats['total_borrowed_books'] : 0;
+    $total_books_notavailable = isset($stats['total_books_notavailable']) ? (int)$stats['total_books_notavailable'] : 0;
+    $total_books_available = isset($stats['total_books_available']) ? (int)$stats['total_books_available'] : 0;
+    $total_books = isset($stats['total_books']) ? (int)$stats['total_books'] : 0;
+}
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -227,85 +226,84 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
         </div>
 
         <!-- Book Management -->
-        <div class="d-flex align-items-center mt-4 mb-2 ms-2">
-            <h2 style="font-size: 1.5rem; font-weight: bold; margin-right: 20px;"><i>List of all books</i></h2>
-            <button class="add-btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">Add New Book</button>
-        </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Book ID</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Genre</th>
-                    <th>Availability</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $book_query = "SELECT id, title, author, genre, available FROM books";
-                $book_result = executeQuery($conn, $book_query, "Error fetching books");
+<div class="d-flex align-items-center mt-4 mb-2 ms-2">
+    <h2 style="font-size: 1.5rem; font-weight: bold; margin-right: 20px;"><i>List of all books</i></h2>
+    <button class="add-btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">Add New Book</button>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Availability</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Query to get data from the view instead of directly from books and transactions
+        $book_query = "SELECT id, title, author, genre, availability FROM book_management_view";
+        $book_result = executeQuery($conn, $book_query, "Error fetching books");
 
-                if (pg_num_rows($book_result) > 0) {
-                    while ($book = pg_fetch_assoc($book_result)) {
-                        // Determine availability text
-                        if ($book['available'] === 't') {
-                            $availability = 'Available';
-                            $availability_class = 'fw-bold text-success';
-                        } else {
-                            // Check if book is borrowed
-                            $borrowed_check_query = "SELECT COUNT(*) FROM transactions WHERE book_id = {$book['id']} AND transaction_type = 'borrow'";
-                            $borrowed_check_result = executeQuery($conn, $borrowed_check_query, "Error checking borrowed books");
-                            $borrowed_count = pg_fetch_result($borrowed_check_result, 0, 0);
+        if (pg_num_rows($book_result) > 0) {
+            while ($book = pg_fetch_assoc($book_result)) {
+                // Determine availability text
+                $availability = $book['availability'];
+                $availability_class = '';
 
-                            if ($borrowed_count > 0) {
-                                $availability = 'Borrowed';
-                                $availability_class = 'fw-bold text-secondary';
-                            } else {
-                                $availability = 'Not Available';
-                                $availability_class = 'fw-bold text-danger';
-                            }
-                        }
-
-                        echo "<tr>
-                            <td>{$book['id']}</td>
-                            <td>{$book['title']}</td>
-                            <td>{$book['author']}</td>
-                            <td>{$book['genre']}</td>
-                            <td class='{$availability_class}'>{$availability}</td>
-                            <td>
-                                <!-- Edit Button -->
-                                <a href='#' 
-                                   class='edit-btn btn-warning' 
-                                   data-bs-toggle='modal' 
-                                   data-bs-target='#editBookModal' 
-                                   data-id='{$book['id']}' 
-                                   data-title='{$book['title']}' 
-                                   data-author='{$book['author']}' 
-                                   data-genre='{$book['genre']}' 
-                                   data-available='" . ($book['available'] === 't' ? 'true' : 'false') . "'>
-                                   Edit
-                                </a>
-                                
-                                <!-- Delete Button -->
-                                <a href='#' 
-                                   class='delete-btn btn-danger' 
-                                   data-bs-toggle='modal' 
-                                   data-bs-target='#deleteModal' 
-                                   data-id='{$book['id']}' 
-                                   data-title='{$book['title']}'>
-                                   Delete
-                                </a>
-                            </td>
-                        </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6'>No books found.</td></tr>";
+                switch ($availability) {
+                    case 'Available':
+                        $availability_class = 'fw-bold text-success';
+                        break;
+                    case 'Borrowed':
+                        $availability_class = 'fw-bold text-secondary';
+                        break;
+                    case 'Not Available':
+                        $availability_class = 'fw-bold text-danger';
+                        break;
                 }
-                ?>
-            </tbody>
-        </table>
+
+                echo "<tr>
+                    <td>{$book['id']}</td>
+                    <td>{$book['title']}</td>
+                    <td>{$book['author']}</td>
+                    <td>{$book['genre']}</td>
+                    <td class='{$availability_class}'>{$availability}</td>
+                    <td>
+                        <!-- Edit Button -->
+                        <a href='#' 
+                           class='edit-btn btn-warning' 
+                           data-bs-toggle='modal' 
+                           data-bs-target='#editBookModal' 
+                           data-id='{$book['id']}' 
+                           data-title='{$book['title']}' 
+                           data-author='{$book['author']}' 
+                           data-genre='{$book['genre']}' 
+                           data-available='" . ($availability === 'Available' ? 'true' : 'false') . "'>
+                           Edit
+                        </a>
+                        
+                        <!-- Delete Button -->
+                        <a href='#' 
+                           class='delete-btn btn-danger' 
+                           data-bs-toggle='modal' 
+                           data-bs-target='#deleteModal' 
+                           data-id='{$book['id']}' 
+                           data-title='{$book['title']}' >
+                           Delete
+                        </a>
+                    </td>
+                </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='6'>No books found.</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
     </div>
 
     <!-- Modal for Editing a Book -->
@@ -318,7 +316,7 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
                 </div>
                 <div class="modal-body">
                     <form id="editBookForm" method="POST" action="../books/edit.php">
-                        <input type="hidden" id="editBookId" name="id">
+                        <input type="hidden" id="editBookId" name="id"> <!-- Hidden input for Book ID -->
                         <div class="mb-3">
                             <label for="editTitle" class="form-label">Title</label>
                             <input type="text" class="form-control" id="editTitle" name="title" required>
@@ -331,12 +329,9 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
                             <label for="editGenre" class="form-label">Genre</label>
                             <input type="text" class="form-control" id="editGenre" name="genre" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="editAvailability" class="form-label">Availability</label>
-                            <select class="form-select" id="editAvailability" name="available">
-                                <option value="true">Available</option>
-                                <option value="false">Not Available</option>
-                            </select>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="editAvailable" name="available">
+                            <label class="form-check-label" for="editAvailable">Available</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
@@ -357,7 +352,7 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
                     <p>Are you sure you want to delete the book <strong id="deleteBookTitle"></strong>?</p>
                 </div>
                 <div class="modal-footer">
-                    <form id="deleteBookForm" method="POST" action="../books/delete.php">
+                    <form id="deleteBookForm" method="POST" action="../books/delete_books.php">
                         <input type="hidden" id="deleteBookId" name="id">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">Delete</button>
@@ -367,7 +362,7 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
         </div>
     </div>
 
-    <!-- Add Book Modal -->
+    <!-- Modal for Adding a New Book -->
     <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -376,25 +371,22 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addBookForm" method="POST" action="../books/add.php">
+                    <form method="POST" action="../books/add_book.php">
                         <div class="mb-3">
-                            <label for="addTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="addTitle" name="title" required>
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
                         </div>
                         <div class="mb-3">
-                            <label for="addAuthor" class="form-label">Author</label>
-                            <input type="text" class="form-control" id="addAuthor" name="author" required>
+                            <label for="author" class="form-label">Author</label>
+                            <input type="text" class="form-control" id="author" name="author" required>
                         </div>
                         <div class="mb-3">
-                            <label for="addGenre" class="form-label">Genre</label>
-                            <input type="text" class="form-control" id="addGenre" name="genre" required>
+                            <label for="genre" class="form-label">Genre</label>
+                            <input type="text" class="form-control" id="genre" name="genre" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="addAvailability" class="form-label">Availability</label>
-                            <select class="form-select" id="addAvailability" name="available">
-                                <option value="true">Available</option>
-                                <option value="false">Not Available</option>
-                            </select>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="available" name="available">
+                            <label class="form-check-label" for="available">Available</label>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Book</button>
                     </form>
@@ -402,6 +394,7 @@ $total_books_borrowed = pg_fetch_result($books_borrowed_result, 0, 'total_books_
             </div>
         </div>
     </div>
+
 
     
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
