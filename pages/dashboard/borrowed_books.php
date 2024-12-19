@@ -8,16 +8,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     exit;
 }
 
-$borrowed_books_query = "SELECT SUM(total_borrowed_books) AS total_borrowed_books FROM user_activity_summary";
-$borrowed_books_result = pg_query($conn, $borrowed_books_query);
-
-// Check if the query is successful
-if ($borrowed_books_result) {
-    $row = pg_fetch_assoc($borrowed_books_result);
-    $total_borrowed_books = $row['total_borrowed_books'];
-} else {
-    die("Error fetching borrowed books stats: " . pg_last_error($conn));
-}
 ?>
 
 
@@ -108,13 +98,12 @@ if ($borrowed_books_result) {
 <body>
     <?php include '../../templates/student_navbar.php'; ?>
 
-    <div class="content mt-5">
-        <h1 class="mb-3" style="font-weight: bolder; font-size:2.4rem; letter-spacing: 1px; font-family: Georgia, 'Times New Roman', Times, serif; color: #4CAF50;">
+    <div class="content mt-3">
+        <h1 class="mb-3" style="font-weight: bolder; font-size:2.4rem; letter-spacing: 1px; font-family: Georgia, 'Times New Roman', Times, serif; color: #374151;">
             <i class="fa fa-book"></i> Your Borrowed Books
         </h1>
         <hr>
 
-        <h2>Total Number of borrowed books:  <span style="font-size: 25px;"><?php echo $total_borrowed_books; ?></span></h2>
 
         <!-- List of Borrowed Books -->
         <table class="table table-bordered" style="margin-top: 30px;">
@@ -133,19 +122,19 @@ if ($borrowed_books_result) {
                 <?php
                 $user_id = $_SESSION['user_id']; 
                 $borrowed_query = "
-    SELECT 
-        t.id AS transaction_id, 
-        b.id AS book_id,
-        b.title, 
-        b.author, 
-        b.genre, 
-        t.transaction_date AS borrowed_date, 
-        t.due_date,
-        t.return_date
-    FROM transactions t
-    INNER JOIN books b ON t.book_id = b.id
-    WHERE t.user_id = $1 AND t.transaction_type = 'borrow'
-    ORDER BY t.transaction_date DESC";
+                    SELECT 
+                        t.id AS transaction_id, 
+                        b.id AS book_id,
+                        b.title, 
+                        b.author, 
+                        b.genre, 
+                        t.transaction_date AS borrowed_date, 
+                        t.due_date,
+                        t.return_date
+                    FROM transactions t
+                    INNER JOIN books b ON t.book_id = b.id
+                    WHERE t.user_id = $1 AND t.transaction_type = 'borrow'
+                    ORDER BY t.transaction_date DESC";
 
 
                 $borrowed_result = pg_query_params($conn, $borrowed_query, array($user_id));

@@ -49,6 +49,7 @@ $book_query = "
         b.author, 
         b.genre, 
         b.available, 
+        b.image_path, -- Add image_path to the query
         CASE 
             WHEN t.user_id = $1 THEN TRUE 
             ELSE FALSE 
@@ -86,6 +87,7 @@ $book_result = executeQuery($conn, $book_query, $params, "Error fetching books")
             margin-left: 250px;
             padding: 20px;
             width: calc(100% - 260px);
+            background-color: #F9FAFB;
         }
 
         table {
@@ -103,7 +105,7 @@ $book_result = executeQuery($conn, $book_query, $params, "Error fetching books")
             font-size: 1rem;
             text-decoration: none;
             padding: 3px 12px;
-            background: #4CAF50;
+            background: #374151;
             color: white;
             border: none;
             border-radius: 3px;
@@ -136,63 +138,110 @@ $book_result = executeQuery($conn, $book_query, $params, "Error fetching books")
 <body>
     <?php include '../../templates/student_navbar.php'; ?>
 
-    <div class="content mt-5">
-        <h1 class="mb-3" style="font-weight: bolder; letter-spacing: 2px; font-family: Georgia, 'Times New Roman', Times, serif; color: #4CAF50;">
-            Welcome, <?php echo htmlspecialchars($_SESSION['name'], ENT_QUOTES, 'UTF-8'); ?>!
+    <div class="content mt-2">
+        <h1 class="mb-3 ms-3" style="font-weight: bolder; letter-spacing:px; font-family: Georgia, 'Times New Roman', Times, serif; color: #374151; font-size:1.5rem"><i>
+                <i class="fas fa-book-open"></i>
+                Featured Books </i>
         </h1>
-        <hr>
+
+        <!-- Books Carousel -->
+        <div id="booksCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#booksCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="d-flex justify-content-center">
+                        <img src="/assets/images/c1.jpg" class="d-block" alt="Featured Book" style="width: 98%; height: 350px; border-radius: 10px; object-fit: cover;">
+                    </div>
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Discover Your Next Favorite Book</h5>
+                        <p>Browse through a curated selection of featured books, each offering unique insights and stories.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="d-flex justify-content-center">
+                        <img src="/assets/images/b3.jpg" class="d-block" alt="Featured Book" style="width: 98%; height: 350px; border-radius: 10px; object-fit: cover;">
+                    </div>
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Explore Diverse Genres</h5>
+                        <p>From self-help to fiction, find books from a variety of genres that cater to all interests.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="d-flex justify-content-center">
+                        <img src="/assets/images/b2.jpg" class="d-block" alt="Featured Book" style="width: 98%; height: 350px; border-radius: 10px; object-fit: cover;">
+                    </div>
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Start Your Reading Journey</h5>
+                        <p>Whether you're an avid reader or just getting started, there's always a new book waiting for you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#booksCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#booksCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
 
         <!-- List of Books -->
-        <h2 class="mt-4" style="font-size: 1.2rem; font-weight: bold; margin-left: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <i>Explore Books You Like!</i>
+        <div class="d-flex align-items-center mb-4 mt-4" style="max-width: 100%; justify-content: space-between;">
+            <h2 class="ms-3" style="font-size: 1.3rem; font-weight: bold; color: #374151;">
+                <i>Explore Books You Like!</i>
+            </h2>
 
             <!-- Search Form -->
-            <form method="GET" action="" class="d-flex ms-3" style="max-width: 500px;">
+            <form method="GET" action="" class="d-flex" style="max-width: 500px;">
                 <input type="text" name="search" class="form-control" placeholder="Search for books..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search'], ENT_QUOTES, 'UTF-8') : ''; ?>">
-                <button type="submit" class="btn btn-primary ms-2">Search</button>
+                <button type="submit" class="btn btn-primary ml-2">Search</button>
             </form>
-        </h2>
+        </div>
 
-        <!-- Books Table -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Book ID</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Genre</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (pg_num_rows($book_result) > 0) {
-                    while ($book = pg_fetch_assoc($book_result)) {
-                        $is_borrowed = $book['is_borrowed_by_user'] === 't';
-                        $is_available = $book['available'] === 't';
 
-                        // Set book status
-                        if ($is_borrowed) {
-                            $status = "<span class='text-secondary fw-bold'>Borrowed</span>";
-                        } elseif (!$is_available) {
-                            $status = "<span class='text-danger fw-bold'>Not Available</span>";
-                        } else {
-                            $status = "<span class='text-success'>Available</span>";
-                        }
+        <!-- Books Cards -->
+        <div class="row">
+            <?php
+            if (pg_num_rows($book_result) > 0) {
+                while ($book = pg_fetch_assoc($book_result)) {
+                    $is_borrowed = $book['is_borrowed_by_user'] === 't';
+                    $is_available = $book['available'] === 't';
 
-                        echo "<tr>
-                        <td>" . htmlspecialchars($book['id']) . "</td>
-                        <td>" . htmlspecialchars($book['title']) . "</td>
-                        <td>" . htmlspecialchars($book['author']) . "</td>
-                        <td>" . htmlspecialchars($book['genre']) . "</td>
-                        <td>" . $status . "</td>
-                        <td>";
+                    // Set book status
+                    if ($is_borrowed) {
+                        $status = "<span class='text-secondary fw-bold'>Borrowed</span>";
+                    } elseif (!$is_available) {
+                        $status = "<span class='text-danger fw-bold'>Not Available</span>";
+                    } else {
+                        $status = "<span class='text-success'>Available</span>";
+                    }
 
-                        if ($is_borrowed || !$is_available) {
-                            echo "<button class='disable-btn' disabled>Not Available</button>";
-                        } else {
-                            echo "<a href='#' 
+                    // Display book card
+                    $image_path = '../assets/images/' . $book['image_path'];
+                    echo "<div class='col-md-4 col-sm-6 mb-4'>
+                        <div class='card h-100'>
+                            <img src='" . $image_path . "' alt='" . htmlspecialchars($book['title']) . "' class='card-img-top' style='height: 250px; object-fit: cover;'>
+                            <div class='card-body'>
+                                <h5 class='card-title fw-bold'>" . htmlspecialchars($book['title']) . "</h5>
+                                <p class='card-text'>
+                                    <strong>Author:</strong> " . htmlspecialchars($book['author']) . "<br>
+                                    <strong>Genre:</strong> " . htmlspecialchars($book['genre']) . "<br>
+                                    <strong>Status:</strong> " . $status . "
+                                </p>
+                        <div class='text-center'>";
+
+                    if (
+                        $is_borrowed || !$is_available
+                    ) {
+                        echo "<button class='btn btn-secondary' disabled>Not Available</button>";
+                    } else {
+                        echo "<a href='#' 
                                 class='btn btn-primary borrow-btn' 
                                 data-bs-toggle='modal' 
                                 data-bs-target='#borrowModal' 
@@ -200,18 +249,19 @@ $book_result = executeQuery($conn, $book_query, $params, "Error fetching books")
                                 data-title='" . htmlspecialchars($book['title']) . "'>
                                 Borrow
                             </a>";
-                        }
-
-                        echo "</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='6'>No books found matching your search.</td></tr>";
+
+                    echo "</div>
+                    </div>
+                </div>
+            </div>";
                 }
-                ?>
-            </tbody>
-        </table>
+            } else {
+                echo "<div class='col-12'><p>No books found matching your search.</p></div>";
+            }
+            ?>
+        </div>
     </div>
-    
     <!-- Borrow Modal -->
     <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -232,21 +282,19 @@ $book_result = executeQuery($conn, $book_query, $params, "Error fetching books")
         </div>
     </div>
 
-
-        <!-- Bootstrap and JavaScript -->
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.borrow-btn').forEach((button) => {
-            button.addEventListener('click', () => {
-                const bookId = button.getAttribute('data-id');
-                const bookTitle = button.getAttribute('data-title');
-                document.querySelector('#borrowBookId').value = bookId;
-                document.querySelector('#borrowModalLabel').textContent = "Borrow " + bookTitle;
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.borrow-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const bookId = button.getAttribute('data-id');
+                    const bookTitle = button.getAttribute('data-title');
+                    document.querySelector('#borrowBookId').value = bookId;
+                    document.querySelector('#borrowModalLabel').textContent = "Borrow " + bookTitle;
+                });
             });
         });
-    });
     </script>
 
 </body>

@@ -1,7 +1,7 @@
 <?php
 $host = "localhost";
 $port = "5432";
-$dbname = "108_library";
+$dbname = "library-system";
 $user = "postgres"; 
 $password = "1504"; 
 

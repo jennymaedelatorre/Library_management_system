@@ -86,7 +86,7 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
             text-decoration: none;
             margin-right: 4px;
             padding: 10px 12px;
-            background: #4CAF50;
+            background: #8D9B7F;
             color: white;
             border: none;
             border-radius: 3px;
@@ -101,7 +101,7 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
             font-size: 1rem;
             text-decoration: none;
             padding: 3px 12px;
-            background: #4CAF50;
+            background: #8D9B7F;
             color: white;
             border: none;
             border-radius: 3px;
@@ -141,7 +141,7 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
 
     <!-- Content Area -->
     <div class="content mt-3">
-        <h1 class="mb-3" style="font-weight: bolder; letter-spacing:px; font-family: Georgia, 'Times New Roman', Times, serif; color: #4CAF50;">
+        <h1 class="mb-3" style="font-weight: bolder; letter-spacing:px; font-family: Georgia, 'Times New Roman', Times, serif; color: #8D9B7F;">
             Welcome, <?php echo htmlspecialchars($_SESSION['name'], ENT_QUOTES, 'UTF-8'); ?>!
         </h1>
         <hr>
@@ -197,7 +197,7 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
 
         <!-- Book Management -->
         <div class="d-flex align-items-center mt-4 mb-2 ms-2">
-            <h2 style="font-size: 1.5rem; font-weight: bold; margin-right: 20px;"><i>List of all books</i></h2>
+            <h2 style="font-size: 1.5rem; font-weight: bold; margin-right: 20px; color:#8D9B7F;"><i>List of all books</i></h2>
             <button class="add-btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">Add New Book</button>
         </div>
         <table class="table table-bordered">
@@ -287,7 +287,7 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
                 </div>
                 <div class="modal-body">
                     <form id="editBookForm" method="POST" action="../books/edit.php">
-                        <input type="hidden" id="editBookId" name="id"> <!-- Hidden input for Book ID -->
+                        <input type="hidden" id="editBookId" name="id"> 
                         <div class="mb-3">
                             <label for="editTitle" class="form-label">Title</label>
                             <input type="text" class="form-control" id="editTitle" name="title" required>
@@ -313,37 +313,42 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
 
 
     <!-- Modal for Adding a New Book -->
-    <div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addBookModalLabel">Add New Book</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="../books/add_book.php">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="author" class="form-label">Author</label>
-                            <input type="text" class="form-control" id="author" name="author" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="genre" class="form-label">Genre</label>
-                            <input type="text" class="form-control" id="genre" name="genre" required>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="available" name="available">
-                            <label class="form-check-label" for="available">Available</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add Book</button>
-                    </form>
-                </div>
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBookModalLabel">Add New Book</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="../books/add_book.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Book Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Author</label>
+                        <input type="text" class="form-control" id="author" name="author" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="genre" class="form-label">Genre</label>
+                        <input type="text" class="form-control" id="genre" name="genre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Upload Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    </div>
+                    <!-- Checkbox for availability -->
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="available" name="available" value="1">
+                        <label class="form-check-label" for="available">Available</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Book</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
 
 
     <!-- Delete Modal -->

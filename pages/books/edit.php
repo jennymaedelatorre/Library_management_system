@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($result) {
             $user_id = $_SESSION['user_id'];  
             $user_type = $_SESSION['role'] == 1 ? 'Admin' : 'Librarian'; 
-            $action = 'edit';
+            $action = 'UPDATE';
             $table_name = 'books';  
             $timestamp = date('Y-m-d H:i:s');  
 

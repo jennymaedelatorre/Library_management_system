@@ -78,6 +78,10 @@ $returned_books_result = executeQuery($conn, $returned_books_query, "Error fetch
             transform: scale(1.05);
         }
 
+        h2 {
+            color: #8D9B7F;
+        }
+
         .edit-btn {
             text-decoration: none;
             margin-right: 4px;
@@ -133,11 +137,11 @@ $returned_books_result = executeQuery($conn, $returned_books_query, "Error fetch
 </head>
 
 <body>
-    <?php include '../../templates/librarian_navbar.php'; ?> 
+    <?php include '../../templates/librarian_navbar.php'; ?>
 
     <!-- Content Area -->
     <div class="content mt-3">
-        <h1 class="mb-3" style="font-weight: bolder; font-size:2.4rem; letter-spacing: 1px; font-family: Georgia, 'Times New Roman', Times, serif; color: #4CAF50;">
+        <h1 class="mb-3" style="font-weight: bolder; font-size:2.4rem; letter-spacing: 1px; font-family: Georgia, 'Times New Roman', Times, serif; color: #8D9B7F;">
             <i class="fa fa-book"></i> Manage Books
         </h1>
         <hr>
@@ -179,71 +183,87 @@ $returned_books_result = executeQuery($conn, $returned_books_query, "Error fetch
             </tbody>
         </table>
 
-        <!-- Borrowed Books Section -->
+        <!-- Combined Books Section -->
         <div class="mt-4">
-            <h2 style="font-size: 1.3rem; font-weight: bold; margin-left: 20px;"><i>Borrowed Books</i></h2>
-            <table class="table table-bordered">
+            <h2 style="font-size: 1.3rem; font-weight: bold; margin-left: 20px;"><i>Borrowed and Returned Books</i></h2>
+            <table class="table table-bordered borrow-return">
                 <thead>
                     <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
                         <th>Book ID</th>
                         <th>Title</th>
                         <th>Author</th>
-                        <th>Genre</th>
                         <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    if (pg_num_rows($borrowed_books_result) > 0) {
-                        while ($book = pg_fetch_assoc($borrowed_books_result)) {
+                    $combined_books_query = "
+            SELECT 
+                studentid, 
+                studentname,  -- Added Student Name
+                bookid, 
+                title, 
+                author, 
+                duedate, 
+                NULL AS returndate, 
+                'Borrowed' AS status,
+                duedate AS sort_date
+            FROM GetCurrentlyBorrowedBooks()
+        
+            UNION ALL
+        
+            SELECT 
+                studentid, 
+                studentname,  -- Added Student Name
+                bookid, 
+                title, 
+                author, 
+                NULL AS duedate, 
+                returndate, 
+                'Returned' AS status,
+                returndate AS sort_date
+            FROM GetReturnedBooks()
+        
+            ORDER BY sort_date DESC NULLS LAST
+            ";
+
+                    // Execute the query
+                    $combined_books_result = pg_query($conn, $combined_books_query);
+
+                    if (!$combined_books_result) {
+                        die("Error fetching books: " . pg_last_error($conn));
+                    }
+
+                    // Display the books
+                    if (pg_num_rows($combined_books_result) > 0) {
+                        while ($book = pg_fetch_assoc($combined_books_result)) {
+                            // Display the respective dates based on status
+                            $due_date = $book['duedate'] ? $book['duedate'] : '-';
+                            $return_date = $book['returndate'] ? $book['returndate'] : '-';
+
                             echo "<tr>
-                                    <td>{$book['id']}</td>
-                                    <td>{$book['title']}</td>
-                                    <td>{$book['author']}</td>
-                                    <td>{$book['genre']}</td>
-                                    <td>{$book['due_date']}</td>
-                                  </tr>";
+                        <td>{$book['studentid']}</td>
+                        <td>{$book['studentname']}</td> <!-- Display Student Name -->
+                        <td>{$book['bookid']}</td>
+                        <td>{$book['title']}</td>
+                        <td>{$book['author']}</td>
+                        <td>{$due_date}</td>
+                        <td>{$return_date}</td>
+                        <td>{$book['status']}</td>
+                    </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='5'>No borrowed books found.</td></tr>";
+                        echo "<tr><td colspan='8'>No borrowed or returned books found.</td></tr>";
                     }
                     ?>
                 </tbody>
             </table>
         </div>
 
-        <!-- Returned Books Section -->
-        <div class="mt-4">
-            <h2 style="font-size: 1.3rem; font-weight: bold; margin-left: 20px;"><i>Returned Books</i></h2>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Book ID</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>Return Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if (pg_num_rows($returned_books_result) > 0) {
-                        while ($book = pg_fetch_assoc($returned_books_result)) {
-                            echo "<tr>
-                                    <td>{$book['id']}</td>
-                                    <td>{$book['title']}</td>
-                                    <td>{$book['author']}</td>
-                                    <td>{$book['genre']}</td>
-                                    <td>{$book['return_date']}</td>
-                                  </tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No returned books found.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
     </div>
 
 </html>
