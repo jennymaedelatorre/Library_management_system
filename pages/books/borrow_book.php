@@ -32,7 +32,7 @@ if ($book['available'] !== 't') {
     die("Sorry, this book is not available for borrowing.");
 }
 
-// Calculate the due date (e.g., 7 days from the current date)
+// Calculate the due date
 $due_date = date('Y-m-d', strtotime('+7 days')); // 7 days from now
 
 // Insert a new transaction for borrowing the book with the due date

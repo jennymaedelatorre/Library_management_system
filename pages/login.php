@@ -118,7 +118,7 @@
     <div class="blur-overlay"></div>
 
     <div class="login-container">
-        <h1>Login to Archiva</h1>
+        <h1>Login to Archieva</h1>
         <form action="../actions/login_action.php" method="POST">
             <label for="email">Email:</label>
             <input type="email" name="email" id="email" placeholder="Enter your email" required>

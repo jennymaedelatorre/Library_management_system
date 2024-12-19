@@ -39,7 +39,7 @@ if (isset($_POST['id'])) {
         // Log the activity: Book deletion
         $user_id = $_SESSION['user_id'];  
         $user_type = $_SESSION['role'] == 1 ? 'Admin' : 'Librarian';  
-        $action = 'delete';  
+        $action = 'DELETE';  
         $table_name = 'books';  
         $timestamp = date('Y-m-d H:i:s'); 
 

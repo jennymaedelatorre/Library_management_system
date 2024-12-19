@@ -32,18 +32,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
             font-weight: bold;
             margin-left: 20px;
             font-style: italic;
+            color: #64748B;
         }
 
         .content {
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            margin-left: 260px;
-            padding: 20px;
-            width: calc(100% - 260px);
+            margin-left: 240px;
+            padding-left: 20px;
+            width: calc(100% - 240px);
+            background-color: #F3F4F6;
         }
 
         .btn {
             padding: 8px 12px;
-            background: #4CAF50;
+            background: #64748B;
             color: white;
             border: none;
             border-radius: 3px;
@@ -59,7 +61,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
             font-size: 1rem;
             text-decoration: none;
             padding: 3px 12px;
-            background: #4CAF50;
+            background: #64748B;
             color: white;
             border: none;
             border-radius: 3px;
@@ -88,12 +90,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
 </head>
 
 <body>
-    <?php include '../../templates/navbar.php'; ?> 
+    <?php include '../../templates/navbar.php'; ?>
 
     <div class="container-fluid">
-        <div class="content mt-3">
-            <h1 class="mb-3" style="font-weight: bolder; font-family: Georgia, 'Times New Roman', Times, serif; color:#4CAF50;">
-                Manage All Users
+        <div class="content" style="padding-top: 30px;">
+            <h1 class="mb-3" style="font-weight: bolder; letter-spacing:px; font-family: Georgia, 'Times New Roman', Times, serif; color: #64748B;">
+                <i class="fas fa-users-cog"></i> Manage All Users
             </h1>
             <hr>
 
@@ -167,24 +169,23 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                 </thead>
                 <tbody>
                     <?php
-                    $librarian_query = "SELECT id, name, email, role FROM users WHERE role = 2"; 
+                    $librarian_query = "SELECT id, name, email, role FROM users WHERE role = 2";
                     $librarian_result = pg_query($conn, $librarian_query);
 
                     if ($librarian_result && pg_num_rows($librarian_result) > 0) {
                         while ($librarian = pg_fetch_assoc($librarian_result)) {
                             echo "<tr>
-                        <td>{$librarian['id']}</td>
-                        <td>{$librarian['name']}</td>
-                        <td>{$librarian['email']}</td>
-                        <td>
-                            <button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editUserModal' 
-                                data-id='{$librarian['id']}' 
-                                data-name='{$librarian['name']}' 
-                                data-email='{$librarian['email']}' 
-                                data-role='{$librarian['role']}'>Edit</button>
-                             <button class='delete-btn btn-danger' data-id='{$librarian['id']}' data-bs-toggle='modal' data-bs-target='#deleteModal'>Delete</button>
-                        </td>
-                    </tr>";
+                                <td>{$librarian['id']}</td>
+                                <td>{$librarian['name']}</td>
+                                <td>{$librarian['email']}</td>
+                                <td>
+                                    <button class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#editUserModal' 
+                                        data-id='{$librarian['id']}' 
+                                        data-name='{$librarian['name']}' 
+                                        data-email='{$librarian['email']}' 
+                                        data-role='{$librarian['role']}'>Edit</button>
+                                </td>
+                            </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='4'>No librarians found.</td></tr>";
@@ -194,32 +195,32 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
             </table>
 
             <h2 class="mt-5">List of All Students</h2>
-<table class="table table-bordered user-table">
-    <thead>
-        <tr>
-            <th style="width: 10%;">User ID</th>
-            <th style="width: 25%;">Name</th>
-            <th style="width: 30%;">Email</th>
-            <th style="width: 20%;">Total Borrowed Books</th>
-            <th style="width: 15%;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        // Modify the query to include total_borrowed_books from the user_activity_summary view
-        $student_query = "
+            <table class="table table-bordered user-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">User ID</th>
+                        <th style="width: 25%;">Name</th>
+                        <th style="width: 30%;">Email</th>
+                        <th style="width: 20%;">Total Borrowed Books</th>
+                        <th style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Modify the query to include total_borrowed_books from the user_activity_summary view
+                    $student_query = "
             SELECT u.id, u.name, u.email, u.role, uas.total_borrowed_books
             FROM users u
             LEFT JOIN user_activity_summary uas ON u.id = uas.user_id
-            WHERE u.role = 3"; // Fetch only students (assuming role 3 is student)
+            WHERE u.role = 3";
 
-        // Execute the query
-        $student_result = pg_query($conn, $student_query);
+                    // Execute the query
+                    $student_result = pg_query($conn, $student_query);
 
-        if ($student_result && pg_num_rows($student_result) > 0) {
-            while ($student = pg_fetch_assoc($student_result)) {
-                // Fetch the data from the result and display it
-                echo "<tr>
+                    if ($student_result && pg_num_rows($student_result) > 0) {
+                        while ($student = pg_fetch_assoc($student_result)) {
+                            // Fetch the data from the result and display it
+                            echo "<tr>
                         <td>{$student['id']}</td>
                         <td>{$student['name']}</td>
                         <td>{$student['email']}</td>
@@ -229,17 +230,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                                 data-id='{$student['id']}' 
                                 data-name='{$student['name']}' 
                                 data-email='{$student['email']}' 
-                                data-role='{$student['role']}'>Edit</button>
-                             <button class='delete-btn btn-danger' data-id='{$student['id']}' data-bs-toggle='modal' data-bs-target='#deleteModal'>Delete</button>
+                                data-role='{$student['role']}'>Edit</button>                        
                         </td>
                     </tr>";
-            }
-        } else {
-            echo "<tr><td colspan='5'>No students found.</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
+                        }
+                    } else {
+                        echo "<tr><td colspan='5'>No students found.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
 
         </div>
 
@@ -268,7 +268,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                             <div class="mb-3">
                                 <label for="role" class="form-label">Role</label>
                                 <select class="form-control" id="role" name="role" required>
-                                    <option value="1">Admin</option>
                                     <option value="2">Librarian</option>
                                     <option value="3">Student</option>
                                 </select>
@@ -301,14 +300,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="userEmail" name="email" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="userRole" name="role" required>
-                                    <option value="1">Admin</option>
-                                    <option value="2">Librarian</option>
-                                    <option value="3">Student</option>
-                                </select>
-                            </div>
                             <button type="submit" class="btn btn-success">Save Changes</button>
                         </form>
                     </div>
@@ -338,14 +329,15 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
 
 
 
+
         <!-- Bootstrap JS & Popper.js -->
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Handle the Edit button click
                 var editButtons = document.querySelectorAll('button[data-bs-toggle="modal"]');
-
                 editButtons.forEach(function(button) {
                     button.addEventListener('click', function() {
                         var userId = button.getAttribute('data-id');
@@ -353,30 +345,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
                         var userEmail = button.getAttribute('data-email');
                         var userRole = button.getAttribute('data-role');
 
-            
                         document.getElementById('user_id').value = userId;
                         document.getElementById('userName').value = userName;
                         document.getElementById('userEmail').value = userEmail;
                         document.getElementById('userRole').value = userRole;
-                    });
-                });
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-            
-                const deleteButtons = document.querySelectorAll('.delete-btn');
-
-             
-                deleteButtons.forEach(function(button) {
-                    button.addEventListener('click', function() {
-                       
-                        const userId = button.getAttribute('data-id');
-
-                    
-                        const deleteUrl = '../users/delete.php?id=' + userId;
-
-                
-                        document.getElementById('deleteUserBtn').setAttribute('href', deleteUrl);
                     });
                 });
             });

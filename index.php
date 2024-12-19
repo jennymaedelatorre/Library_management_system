@@ -90,9 +90,9 @@
     <div class="blur-overlay"></div>
 
     <div>
-        <h1>Welcome to Archiva!</h1>
+        <h1>Welcome to <span style="color:#4CAF50; font-style:italic; font-weight:bolder;">Archieva!</span></h1>
         <p class="intro">
-            Archiva is your gateway to a world of endless stories, knowledge, and learning.
+            Archieva is your gateway to a world of endless stories, knowledge, and learning.
             Whether you're a student, librarian, or administrator, our system is designed to
             make managing and discovering books easier than ever. Dive into a seamlessly organized
             library experience tailored just for you.
