@@ -230,23 +230,24 @@ if (!$returned_books_result) {
                 </thead>
                 <tbody>
                     <?php
-                    $user_log_query = "SELECT id, timestamp, user_id, user_type, table_name, action 
-                                    FROM activity_logs 
-                                    WHERE table_name = 'users' 
-                                    ORDER BY timestamp DESC
-                                    LIMIT 6"; 
+                    $user_log_query = "SELECT id, timestamp, user_id, user_type, table_name, action
+                    FROM activity_logs
+                    WHERE table_name = 'transactions'
+                    ORDER BY timestamp DESC
+                    LIMIT 6";                
+    
                     $user_log_result = pg_query($conn, $user_log_query);
 
                     if ($user_log_result && pg_num_rows($user_log_result) > 0) {
                         while ($log = pg_fetch_assoc($user_log_result)) {
                             echo "<tr>
-                                <td>{$log['id']}</td>
-                                <td>{$log['timestamp']}</td>
-                                <td>{$log['user_id']}</td>
-                                <td>{$log['user_type']}</td>
-                                <td>{$log['table_name']}</td>
-                                <td>{$log['action']}</td>
-                            </tr>";
+                        <td>{$log['id']}</td>
+                        <td>{$log['timestamp']}</td>
+                        <td>{$log['user_id']}</td>
+                        <td>{$log['user_type']}</td>
+                        <td>{$log['table_name']}</td>
+                        <td>{$log['action']}</td>
+                    </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='7'>No user activity logs found.</td></tr>";
@@ -271,22 +272,22 @@ if (!$returned_books_result) {
                 <tbody>
                     <?php
                     $book_log_query = "SELECT id, timestamp, user_id, user_type, table_name, action 
-                                    FROM activity_logs 
-                                    WHERE table_name = 'books' 
-                                    ORDER BY timestamp DESC
-                                    LIMIT 6";  
+                               FROM activity_logs 
+                               WHERE table_name = 'books' 
+                               ORDER BY timestamp DESC
+                               LIMIT 6";  
                     $book_log_result = pg_query($conn, $book_log_query);
 
                     if ($book_log_result && pg_num_rows($book_log_result) > 0) {
                         while ($log = pg_fetch_assoc($book_log_result)) {
                             echo "<tr>
-                                <td>{$log['id']}</td>
-                                <td>{$log['timestamp']}</td>
-                                <td>{$log['user_id']}</td>
-                                <td>{$log['user_type']}</td>
-                                <td>{$log['table_name']}</td>
-                                <td>{$log['action']}</td>
-                            </tr>";
+                        <td>{$log['id']}</td>
+                        <td>{$log['timestamp']}</td>
+                        <td>{$log['user_id']}</td>
+                        <td>{$log['user_type']}</td>
+                        <td>{$log['table_name']}</td>
+                        <td>{$log['action']}</td>
+                    </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='7'>No book activity logs found.</td></tr>";
