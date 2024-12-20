@@ -295,7 +295,6 @@ if (!$returned_books_result) {
                     ?>
                 </tbody>
             </table>
-
         </div>
     </div>
 

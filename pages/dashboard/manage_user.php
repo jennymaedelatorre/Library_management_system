@@ -207,8 +207,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     <tbody>
         <?php
         // Modify the query to include total_borrowed_books from the user_activity_summary view
-        $student_query = "
-            SELECT u.id, u.name, u.email, u.role, uas.total_borrowed_books
+        $student_query = "SELECT u.id, u.name, u.email, u.role, uas.total_borrowed_books
             FROM users u
             LEFT JOIN user_activity_summary uas ON u.id = uas.user_id
             WHERE u.role = 3"; // Fetch only students (assuming role 3 is student)
