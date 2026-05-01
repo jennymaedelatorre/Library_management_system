@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     header("Location: ../login.php");
     exit;
 }
+pg_query($conn, "SET role TO 'admin'");
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

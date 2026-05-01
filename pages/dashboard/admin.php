@@ -79,6 +79,8 @@ if ($borrowed_books_stats_result && pg_num_rows($borrowed_books_stats_result) > 
     <style>
         .container-fluid {
             display: flex;
+            background-color: #F3F4F6;
+
         }
 
         .content {

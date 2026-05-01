@@ -90,7 +90,7 @@
     <div class="blur-overlay"></div>
 
     <div>
-        <h1>Welcome to <span style="color:#4CAF50; font-style:italic; font-weight:bolder;">Archieva!</span></h1>
+        <h1>Welcome to <span style="color:#4CAF50; font-weight:bolder;">Archieva!</span></h1>
         <p class="intro">
             Archieva is your gateway to a world of endless stories, knowledge, and learning.
             Whether you're a student, librarian, or administrator, our system is designed to
@@ -102,3 +102,5 @@
 
     <?php include 'templates/footer.php'; ?>
 </body>
+
+<!-- run: open xamp, start apache then use this command: php -S 127.0.0.1:8000 -->
