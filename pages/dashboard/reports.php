@@ -51,8 +51,15 @@ if (!$returned_books_result) {
 
 
     <style>
+        body {
+            background-color: #F3F4F6;
+
+        }
+
         .container-fluid {
             display: flex;
+            /* background-color: #F3F4F6; */
+
         }
 
         h2 {
@@ -120,7 +127,7 @@ if (!$returned_books_result) {
     <div class="container-fluid">
         <div class="content" style="padding-top: 30px;">
             <h1 class="mb-3" style="font-weight: bolder; letter-spacing:px; font-family: Georgia, 'Times New Roman', Times, serif; color: #64748B;"">
-            <i class=" fas fa-chart-bar"></i> Activity Logs Report
+            <i class=" fas fa-chart-line"></i> Activity Logs Report
             </h1>
             <hr>
 
@@ -145,7 +152,7 @@ if (!$returned_books_result) {
                         $combined_books_query = "
                                 SELECT 
                                     studentid, 
-                                    studentname,  -- Added Student Name
+                                    studentname, 
                                     bookid, 
                                     title, 
                                     author, 
@@ -159,7 +166,7 @@ if (!$returned_books_result) {
                             
                                 SELECT 
                                     studentid, 
-                                    studentname,  -- Added Student Name
+                                    studentname, 
                                     bookid, 
                                     title, 
                                     author, 
@@ -188,7 +195,7 @@ if (!$returned_books_result) {
 
                                 echo "<tr>
                                         <td>{$book['studentid']}</td>
-                                        <td>{$book['studentname']}</td> <!-- Display Student Name -->
+                                        <td>{$book['studentname']}</td> 
                                         <td>{$book['bookid']}</td>
                                         <td>{$book['title']}</td>
                                         <td>{$book['author']}</td>
@@ -207,56 +214,101 @@ if (!$returned_books_result) {
 
 
 
-            <!-- Combined Activity Logs Section -->
-            <h2 class="mt-5">List of Activity Logs</h2>
+            <h2 class="mt-5">Book Activity Logs</h2>
             <table class="table table-bordered logs-table">
                 <thead>
                     <tr>
                         <th style="width: 10%;">Log ID</th>
                         <th style="width: 15%;">Timestamp</th>
-                        <th style="width: 15%;">User ID</th>
                         <th style="width: 10%;">User Type</th>
                         <th style="width: 15%;">Table Name</th>
                         <th style="width: 10%;">Action</th>
-                        <th style="width: 15%;">Log Type</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $combined_log_query = "
-                        SELECT id, timestamp, user_id, user_type, table_name, action, 'User Log' AS log_type 
+                    // Query to fetch logs for book-related actions
+                    $book_log_query = "
+                        SELECT id, timestamp, user_type, table_name, action 
                         FROM activity_logs 
-                        WHERE table_name = 'users'
-                        
-                        UNION ALL
-                        
-                        SELECT id, timestamp, user_id, user_type, table_name, action, 'Book Log' AS log_type 
-                        FROM activity_logs 
-                        WHERE table_name = 'books'
-                        
+                        WHERE table_name = 'books' 
                         ORDER BY timestamp DESC
-                        LIMIT 10
-                    ";
-                    $combined_log_result = pg_query($conn, $combined_log_query);
+                        ";
 
-                    if ($combined_log_result && pg_num_rows($combined_log_result) > 0) {
-                        while ($log = pg_fetch_assoc($combined_log_result)) {
+                    // Execute the query for Book Logs
+                    $book_log_result = pg_query($conn, $book_log_query);
+
+                    // Check if there are any book logs
+                    if ($book_log_result && pg_num_rows($book_log_result) > 0) {
+                        while ($log = pg_fetch_assoc($book_log_result)) {
+                            // Format the timestamp
+                            $timestamp = date("Y-m-d H:i:s", strtotime($log['timestamp']));
+
+                            // Display log entry in a table row
                             echo "<tr>
                     <td>{$log['id']}</td>
-                    <td>{$log['timestamp']}</td>
-                    <td>{$log['user_id']}</td>
+                    <td>{$timestamp}</td>
                     <td>{$log['user_type']}</td>
                     <td>{$log['table_name']}</td>
                     <td>{$log['action']}</td>
-                    <td>{$log['log_type']}</td>
                 </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='7'>No activity logs found.</td></tr>";
+                        echo "<tr><td colspan='5'>No book-related logs found.</td></tr>";
                     }
                     ?>
                 </tbody>
             </table>
+
+
+            <h2 class="mt-5">Transaction Activity Logs</h2>
+            <table class="table table-bordered logs-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Log ID</th>
+                        <th style="width: 15%;">Timestamp</th>
+                        <th style="width: 10%;">User Type</th>
+                        <th style="width: 15%;">Table Name</th>
+                        <th style="width: 10%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Query to fetch logs for Transaction-related actions by Students
+                    $transaction_log_query = "
+        SELECT id, timestamp, user_type, table_name, action 
+        FROM activity_logs 
+        WHERE table_name = 'transactions' AND user_type = 'Student'
+        ORDER BY timestamp DESC
+        LIMIT 10
+        ";
+
+                    // Execute the query for Transaction Logs
+                    $transaction_log_result = pg_query($conn, $transaction_log_query);
+
+                    // Check if there are any transaction logs
+                    if ($transaction_log_result && pg_num_rows($transaction_log_result) > 0) {
+                        while ($log = pg_fetch_assoc($transaction_log_result)) {
+                            // Format the timestamp
+                            $timestamp = date("Y-m-d H:i:s", strtotime($log['timestamp']));
+
+                            echo "<tr>
+                    <td>{$log['id']}</td>
+                    <td>{$timestamp}</td>
+                    <td>{$log['user_type']}</td>
+                    <td>{$log['table_name']}</td>
+                    <td>{$log['action']}</td>
+                </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5'>No transaction-related logs found.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+
+
+
 
         </div>
     </div>

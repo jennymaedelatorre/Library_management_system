@@ -13,15 +13,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 3) {
     exit;
 }
 
-// Debugging: Ensure session has user_id
+
 if (!isset($_SESSION['user_id'])) {
     die("Error: User ID is not set. Please log in.");
 }
 
-// Assign user_id to a variable
+
 $user_id = $_SESSION['user_id'];
 
-// Helper function to safely execute queries
 function executeQuery($conn, $query, $params, $errorMessage)
 {
     $result = pg_query_params($conn, $query, $params);
@@ -32,13 +31,13 @@ function executeQuery($conn, $query, $params, $errorMessage)
 }
 
 // Search handling
-$search_query = ''; // Default to no search condition
-$params = [$user_id]; // Initialize query parameters
+$search_query = ''; 
+$params = [$user_id]; 
 
 if (isset($_GET['search']) && trim($_GET['search']) !== '') {
     $search_value = '%' . pg_escape_string($_GET['search']) . '%';
     $search_query = "AND (b.title ILIKE $2 OR b.author ILIKE $2 OR b.genre ILIKE $2)";
-    $params[] = $search_value; // Add search term as a parameter
+    $params[] = $search_value; 
 }
 
 // Query to fetch books based on search term and user borrow status
@@ -49,7 +48,7 @@ $book_query = "
         b.author, 
         b.genre, 
         b.available, 
-        b.image_path, -- Add image_path to the query
+        b.image_path, 
         CASE 
             WHEN t.user_id = $1 THEN TRUE 
             ELSE FALSE 

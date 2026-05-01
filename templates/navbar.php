@@ -62,13 +62,11 @@
 </div>
 
 <script>
-    // Get all sidebar links
     const links = document.querySelectorAll('.sidebar a');
 
-    // Get the current page URL
     const currentPage = window.location.href;
 
-    // Loop through all the links and add the 'active' class if the link's href matches the current page URL
+    
     links.forEach(link => {
         if (currentPage.includes(link.getAttribute('href'))) {
             link.classList.add('active');

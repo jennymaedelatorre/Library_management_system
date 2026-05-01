@@ -43,6 +43,6 @@ if (!$update_result) {
 }
 
 
-header("Location: ../dashboard/student.php");
+header("Location: ../dashboard/borrowed_books.php");
 exit;
 ?>

@@ -12,7 +12,7 @@ date_default_timezone_set('Asia/Manila');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image'])) {
     $image = $_FILES['image'];
-    $target_dir = "../assets/images/"; // Path to the 'uploads' directory
+    $target_dir = "../assets/images/";
 
     // Check if the directory exists, if not, create it
     if (!is_dir($target_dir)) {
@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image'])) {
 
     // Move the uploaded file to the 'uploads' directory
     if (move_uploaded_file($image['tmp_name'], $target_file)) {
-        // Save the file path to the database
         $image_path = $unique_file_name; 
 
         $available = isset($_POST['available']) ? 1 : 0; 
@@ -50,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image'])) {
             // Log the success of the book addition
             $user_id = $_SESSION['user_id'];
             $user_type = $_SESSION['role'] == 1 ? 'Admin' : 'Librarian';
-            $action = 'ADD'; 
+            $action = 'INSERT'; 
             $table_name = 'books';
             $timestamp = date('Y-m-d H:i:s');
 

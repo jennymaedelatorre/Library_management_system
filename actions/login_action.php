@@ -15,6 +15,10 @@ if (!$email) {
 $query = "SELECT id, name, password, role FROM users WHERE email = $1";
 $result = pg_query_params($conn, $query, [$email]);
 
+// After logging in as an admin or user:
+pg_query($conn, "SET role TO " . $_SESSION['role']);
+
+
 if ($result && pg_num_rows($result) === 1) {
     $user = pg_fetch_assoc($result);
 
